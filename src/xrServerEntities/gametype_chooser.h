@@ -21,6 +21,7 @@ enum EGameIDs
     eGameIDCaptureTheArtefact = u32(1) << 4,
     eGameIDDominationZone = u32(1) << 5,
     eGameIDTeamDominationZone = u32(1) << 6,
+    eGameIDCoop = u32(1) << 7,  // Cooperative multiplayer
 };
 
 // This enum should "extend" EGameIDs with the values which are defined in SoC.
@@ -39,6 +40,7 @@ inline EGameIDs ParseStringToGameType(pcstr str)
     };
 
     if (IS("single"))                          return eGameIDSingle;
+    if (IS("coop") || IS("cooperative"))       return eGameIDCoop;
     if (IS("deathmatch") || IS("dm"))          return eGameIDDeathmatch;
     if (IS("teamdeathmatch") || IS("tdm"))     return eGameIDTeamDeathmatch;
     if (IS("artefacthunt") || IS("ah"))        return eGameIDArtefactHunt;

@@ -16,3 +16,8 @@ bool IsGameTypeSingle() noexcept
 {
     return g_pGamePersistent->GameType() == eGameIDSingle;
 }
+
+bool IsGameTypeCoop() noexcept
+{
+    return g_pGamePersistent->GameType() == eGameIDCoop;
+}
