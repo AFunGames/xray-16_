@@ -587,6 +587,24 @@ target_sources(xrGame PRIVATE
     game_sv_teamdeathmatch.cpp
     game_sv_teamdeathmatch.h
     game_sv_teamdeathmatch_process_event.cpp
+    # Co-op multiplayer module
+    xr_coop/coop_protocol.h
+    xr_coop/coop_net_entity.h
+    xr_coop/coop_net_entity.cpp
+    xr_coop/coop_session_manager.h
+    xr_coop/coop_session_manager.cpp
+    xr_coop/coop_player_state.h
+    xr_coop/coop_player_state.cpp
+    xr_coop/coop_damage_handler.h
+    xr_coop/coop_damage_handler.cpp
+    xr_coop/coop_ai_sync.h
+    xr_coop/coop_ai_sync.cpp
+    xr_coop/coop_debug_overlay.h
+    xr_coop/coop_debug_overlay.cpp
+    xr_coop/game_sv_coop.h
+    xr_coop/game_sv_coop.cpp
+    xr_coop/game_cl_coop.h
+    xr_coop/game_cl_coop.cpp
     GameTask.cpp
     GameTaskDefs.h
     GameTask.h

@@ -219,12 +219,14 @@ constexpr CLASS_ID CLSID_SV_GAME_DEATHMATCH         = xray::make_clsid("SV_DM   
 constexpr CLASS_ID CLSID_SV_GAME_TEAMDEATHMATCH     = xray::make_clsid("SV_TDM  ");
 constexpr CLASS_ID CLSID_SV_GAME_ARTEFACTHUNT       = xray::make_clsid("SV_AHUNT");
 constexpr CLASS_ID CLSID_SV_GAME_CAPTURETHEARTEFACT = xray::make_clsid("SV_CTA  ");
+constexpr CLASS_ID CLSID_SV_GAME_COOP               = xray::make_clsid("SV_COOP ");
 //constexpr CLASS_ID CLSID_GAME_CS                    = xray::make_clsid("SV_CS   ");
 constexpr CLASS_ID CLSID_CL_GAME_SINGLE             = xray::make_clsid("CL_SINGL");
 constexpr CLASS_ID CLSID_CL_GAME_DEATHMATCH         = xray::make_clsid("CL_DM   ");
 constexpr CLASS_ID CLSID_CL_GAME_TEAMDEATHMATCH     = xray::make_clsid("CL_TDM  ");
 constexpr CLASS_ID CLSID_CL_GAME_ARTEFACTHUNT       = xray::make_clsid("CL_AHUNT");
 constexpr CLASS_ID CLSID_CL_GAME_CAPTURETHEARTEFACT = xray::make_clsid("CL_CTA  ");
+constexpr CLASS_ID CLSID_CL_GAME_COOP               = xray::make_clsid("CL_COOP ");
 
 // Game UI types
 constexpr CLASS_ID CLSID_GAME_UI_SINGLE             = xray::make_clsid("UI_SINGL");
@@ -232,5 +234,6 @@ constexpr CLASS_ID CLSID_GAME_UI_DEATHMATCH         = xray::make_clsid("UI_DM   
 constexpr CLASS_ID CLSID_GAME_UI_TEAMDEATHMATCH     = xray::make_clsid("UI_TDM  ");
 constexpr CLASS_ID CLSID_GAME_UI_ARTEFACTHUNT       = xray::make_clsid("UI_AHUNT");
 constexpr CLASS_ID CLSID_GAME_UI_CAPTURETHEARTEFACT = xray::make_clsid("UI_CTA  ");
+constexpr CLASS_ID CLSID_GAME_UI_COOP               = xray::make_clsid("UI_COOP ");
 
 constexpr CLASS_ID CLSID_ONLINE_OFFLINE_GROUP       = xray::make_clsid("ON_OFF_G");

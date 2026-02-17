@@ -75,6 +75,49 @@ enum : u32
     M_SECURE_MESSAGE,
     M_CREATE_PLAYER_STATE,
     M_COMPRESSED_UPDATE_OBJECTS,
+    
+    //-----------------------------------------------------
+    // Co-op multiplayer messages (start at 0x1000 to avoid conflicts)
+    //-----------------------------------------------------
+    M_COOP_BASE = 0x1000,
+    
+    // Session management
+    M_COOP_SESSION_INFO,          // Host sends session info to connecting client
+    M_COOP_JOIN_REQUEST,          // Client requests to join session
+    M_COOP_JOIN_RESPONSE,         // Host accepts/rejects join request
+    M_COOP_PLAYER_JOINED,         // Broadcast: player joined session
+    M_COOP_PLAYER_LEFT,           // Broadcast: player left session
+    
+    // Player state replication
+    M_COOP_PLAYER_INPUT,          // Client sends input to server
+    M_COOP_PLAYER_STATE,          // Server sends player state snapshot
+    M_COOP_PLAYER_SPAWN,          // Player spawned in world
+    M_COOP_PLAYER_DESPAWN,        // Player removed from world
+    
+    // Entity replication  
+    M_COOP_ENTITY_STATE,          // Entity state snapshot
+    M_COOP_ENTITY_SPAWN,          // Entity spawned
+    M_COOP_ENTITY_DESPAWN,        // Entity destroyed
+    
+    // Combat
+    M_COOP_FIRE_EVENT,            // Player fired weapon
+    M_COOP_DAMAGE_EVENT,          // Damage applied to entity
+    M_COOP_HIT_CONFIRM,           // Server confirms hit
+    
+    // AI sync
+    M_COOP_AI_STATE,              // AI NPC state update
+    M_COOP_AI_SPAWN,              // AI spawned
+    M_COOP_AI_DESPAWN,            // AI destroyed
+    
+    // UX features
+    M_COOP_PING_MARKER,           // Player placed ping marker
+    M_COOP_CHAT_MESSAGE,          // Chat message
+    M_COOP_PLAYER_LIST,           // Full player list update
+    
+    // Debug
+    M_COOP_DEBUG_INFO,            // Debug information exchange
+    
+    M_COOP_MAX
 };
 
 enum : u32
