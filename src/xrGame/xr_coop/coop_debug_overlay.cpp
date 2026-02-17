@@ -231,10 +231,27 @@ void CoopDebugOverlay::OnPacketReceived(u32 size)
 
 void CoopDebugOverlay::OnSnapshotReceived(SnapshotID id)
 {
-    // Check for out-of-order snapshots
-    if (id < m_last_snapshot_id && m_last_snapshot_id - id < 1000)
+    // Check for out-of-order snapshots, accounting for wraparound
+    // A snapshot is considered out-of-order if:
+    // - It's less than the last received, AND
+    // - The difference is small (not a wraparound case)
+    // For wraparound: when last_id is near max and new id is near 0, 
+    // the difference will be very large, which is fine
+    const SnapshotID max_reasonable_gap = 1000;
+    
+    if (m_last_snapshot_id != 0 && id != 0)
     {
-        OnDesyncDetected("Out-of-order snapshot");
+        // Check if this is a genuine out-of-order (not wraparound)
+        if (id < m_last_snapshot_id)
+        {
+            SnapshotID diff = m_last_snapshot_id - id;
+            // Only flag as desync if the gap is small (genuine out-of-order)
+            // Large gaps indicate wraparound which is expected
+            if (diff < max_reasonable_gap)
+            {
+                OnDesyncDetected("Out-of-order snapshot");
+            }
+        }
     }
     
     m_last_snapshot_id = id;

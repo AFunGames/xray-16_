@@ -9,7 +9,7 @@
 #include "xrServer.h"
 #include "Entity.h"
 #include "Hit.h"
-#include "xrCDB/Intersect.hpp"
+#include "xrServerEntities/xrMessages.h"
 
 namespace coop
 {
@@ -55,22 +55,14 @@ void CoopDamageHandler::OnFireEvent(const CoopFireEvent& fire_event, ClientID se
     // Maximum fire range
     const float max_range = 500.0f;
     
-    // Do raycast
-    collide::rq_result result;
-    collide::ray_defs ray_query(origin, direction, max_range, CDB::OPT_ONLYNEAREST, collide::rqtBoth);
-    
-    // Get the level for collision testing
-    CLevel& level = Level();
-    
-    // For MVP, we use a simplified hit detection
-    // In production, this would use the proper collision system
+    // MVP: Simplified hit detection without full raycast
+    // TODO: In production, use proper collision system:
+    // collide::rq_result result;
+    // collide::ray_defs ray_query(origin, direction, max_range, CDB::OPT_ONLYNEAREST, collide::rqtBoth);
+    // Level().ObjectSpace.RayQuery(ray_query, callback);
     
     Fvector hit_pos = origin;
     hit_pos.mad(direction, max_range);
-    
-    // Find potential targets along the ray
-    // This is a simplified implementation - real implementation would use proper raycasting
-    const float hit_radius = 0.5f;  // Simplified hit detection radius
     
     // For now, broadcast the fire event to all clients for visual effects
     NET_Packet P;

@@ -32,51 +32,8 @@ constexpr u32 COOP_NETID_PLAYER_MIN = 1;
 constexpr u32 COOP_NETID_PLAYER_MAX = 64;
 constexpr u32 COOP_NETID_ENTITY_MIN = 65;
 
-// Co-op specific message types (added to existing xrMessages.h enum)
-// These are defined here for documentation but actual values are in xrMessages.h
-enum ECoopMessageTypes : u32
-{
-    // Start co-op messages after the last engine message
-    M_COOP_BASE = 0x1000,
-    
-    // Session management
-    M_COOP_SESSION_INFO,          // Host sends session info to connecting client
-    M_COOP_JOIN_REQUEST,          // Client requests to join session
-    M_COOP_JOIN_RESPONSE,         // Host accepts/rejects join request
-    M_COOP_PLAYER_JOINED,         // Broadcast: player joined session
-    M_COOP_PLAYER_LEFT,           // Broadcast: player left session
-    
-    // Player state replication
-    M_COOP_PLAYER_INPUT,          // Client sends input to server
-    M_COOP_PLAYER_STATE,          // Server sends player state snapshot
-    M_COOP_PLAYER_SPAWN,          // Player spawned in world
-    M_COOP_PLAYER_DESPAWN,        // Player removed from world
-    
-    // Entity replication  
-    M_COOP_ENTITY_STATE,          // Entity state snapshot
-    M_COOP_ENTITY_SPAWN,          // Entity spawned
-    M_COOP_ENTITY_DESPAWN,        // Entity destroyed
-    
-    // Combat
-    M_COOP_FIRE_EVENT,            // Player fired weapon
-    M_COOP_DAMAGE_EVENT,          // Damage applied to entity
-    M_COOP_HIT_CONFIRM,           // Server confirms hit
-    
-    // AI sync
-    M_COOP_AI_STATE,              // AI NPC state update
-    M_COOP_AI_SPAWN,              // AI spawned
-    M_COOP_AI_DESPAWN,            // AI destroyed
-    
-    // UX features
-    M_COOP_PING_MARKER,           // Player placed ping marker
-    M_COOP_CHAT_MESSAGE,          // Chat message
-    M_COOP_PLAYER_LIST,           // Full player list update
-    
-    // Debug
-    M_COOP_DEBUG_INFO,            // Debug information exchange
-    
-    M_COOP_MAX
-};
+// Co-op message types are defined in xrServerEntities/xrMessages.h
+// Starting at M_COOP_BASE (0x1000)
 
 // Join response codes
 enum EJoinResponseCode : u8

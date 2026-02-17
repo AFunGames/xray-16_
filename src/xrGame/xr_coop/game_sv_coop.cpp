@@ -11,13 +11,14 @@
 #include "xrServer.h"
 #include "Level.h"
 #include "Actor.h"
+#include "xrServerEntities/xrMessages.h"
 
 game_sv_Coop::game_sv_Coop()
     : m_max_players(coop::COOP_MAX_PLAYERS)
     , m_last_sync_time(0)
     , m_snapshot_id(0)
 {
-    m_type = eGameIDSingle;  // Treat as single-player variant for compatibility
+    m_type = eGameIDCoop;  // Set proper game type for co-op mode
 }
 
 game_sv_Coop::~game_sv_Coop()
@@ -248,7 +249,7 @@ void game_sv_Coop::SpawnPlayerForClient(ClientID client_id)
     // For MVP, we send a spawn message to the client
     
     NET_Packet P;
-    P.w_begin(coop::M_COOP_PLAYER_SPAWN);
+    P.w_begin(M_COOP_PLAYER_SPAWN);
     P.w_u32(player_state->GetCoopNetID());
     P.w_float(spawn_point.P.x);
     P.w_float(spawn_point.P.y);
@@ -269,7 +270,7 @@ void game_sv_Coop::DespawnPlayerForClient(ClientID client_id)
     
     // Notify all clients about despawn
     NET_Packet P;
-    P.w_begin(coop::M_COOP_PLAYER_DESPAWN);
+    P.w_begin(M_COOP_PLAYER_DESPAWN);
     P.w_u32(player_state->GetCoopNetID());
     
     // TODO: Broadcast to all clients
@@ -285,7 +286,7 @@ void game_sv_Coop::SendPlayerSnapshots()
         if (state && state->IsCoopDirty())
         {
             NET_Packet P;
-            P.w_begin(coop::M_COOP_PLAYER_STATE);
+            P.w_begin(M_COOP_PLAYER_STATE);
             state->WriteCoopSnapshot(P);
             
             // Broadcast to all clients
@@ -322,7 +323,7 @@ void game_sv_Coop::ProcessCoopMessage(NET_Packet& P, ClientID sender)
     
     switch (msg_type)
     {
-    case coop::M_COOP_PLAYER_INPUT:
+    case M_COOP_PLAYER_INPUT:
         {
             // Read input from client
             coop::CoopPlayerInput input;
@@ -342,7 +343,7 @@ void game_sv_Coop::ProcessCoopMessage(NET_Packet& P, ClientID sender)
         }
         break;
         
-    case coop::M_COOP_FIRE_EVENT:
+    case M_COOP_FIRE_EVENT:
         {
             coop::CoopFireEvent fire_event;
             fire_event.timestamp = P.r_u32();

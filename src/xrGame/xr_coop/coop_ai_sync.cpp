@@ -5,6 +5,7 @@
 #include "coop_ai_sync.h"
 #include "coop_session_manager.h"
 #include "Entity.h"
+#include "xrServerEntities/xrMessages.h"
 
 namespace coop
 {
@@ -19,8 +20,11 @@ CoopAIEntity::CoopAIEntity()
     , m_interp_buffer_count(0)
     , m_last_update_time(0)
 {
-    ZeroMemory(&m_state, sizeof(m_state));
-    ZeroMemory(m_interp_buffer, sizeof(m_interp_buffer));
+    // CoopAIState has a default constructor - no ZeroMemory needed
+    for (u32 i = 0; i < INTERP_BUFFER_SIZE; ++i)
+    {
+        m_interp_buffer[i] = CoopAIState();
+    }
 }
 
 CoopAIEntity::~CoopAIEntity()
@@ -397,18 +401,36 @@ void CoopAIManager::CreateSnapshots(xr_vector<NET_Packet>& out_packets)
 
 void CoopAIManager::ApplySnapshot(NET_Packet& P)
 {
-    // Read net_id from packet (peek without advancing)
-    u32 net_id = P.r_u32();
-    P.r_seek(P.r_tell() - sizeof(u32));  // Seek back
+    // Read the AI state directly - no seeking needed if we structure it properly
+    CoopAIState state;
+    state.net_id = P.r_u32();
+    state.timestamp = P.r_u32();
     
-    CoopAIEntity* ai = GetAI(net_id);
+    state.pos_x = P.r_float();
+    state.pos_y = P.r_float();
+    state.pos_z = P.r_float();
+    state.yaw = P.r_float();
+    state.pitch = P.r_float();
+    
+    state.vel_x = P.r_float();
+    state.vel_y = P.r_float();
+    state.vel_z = P.r_float();
+    
+    state.health = P.r_float();
+    state.anim_state = P.r_u16();
+    state.ai_state = P.r_u8();
+    state.flags = P.r_u8();
+    state.target_net_id = P.r_u32();
+    
+    CoopAIEntity* ai = GetAI(state.net_id);
     if (ai)
     {
-        ai->ReadCoopSnapshot(P);
+        ai->AddStateToBuffer(state);
+        ai->GetStateMutable() = state;
     }
     else
     {
-        Msg("[COOP] Received AI snapshot for unknown entity: net_id=%u", net_id);
+        Msg("[COOP] Received AI snapshot for unknown entity: net_id=%u", state.net_id);
     }
 }
 

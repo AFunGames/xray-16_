@@ -13,6 +13,7 @@
 #include "Actor.h"
 #include "Inventory.h"
 #include "UIGameSP.h"
+#include "xrServerEntities/xrMessages.h"
 
 game_cl_Coop::game_cl_Coop()
     : m_local_player_state(nullptr)
@@ -127,7 +128,7 @@ void game_cl_Coop::SendPlayerInput()
     
     // Send to server
     NET_Packet P;
-    P.w_begin(coop::M_COOP_PLAYER_INPUT);
+    P.w_begin(M_COOP_PLAYER_INPUT);
     P.w_u32(input.timestamp);
     P.w_u16(input.move_flags);
     P.w_float(input.yaw);
@@ -176,31 +177,31 @@ void game_cl_Coop::OnCoopMessage(NET_Packet& P, u16 msg_type)
 {
     switch (msg_type)
     {
-    case coop::M_COOP_PLAYER_SPAWN:
+    case M_COOP_PLAYER_SPAWN:
         OnRemotePlayerSpawn(P);
         break;
         
-    case coop::M_COOP_PLAYER_DESPAWN:
+    case M_COOP_PLAYER_DESPAWN:
         OnRemotePlayerDespawn(P);
         break;
         
-    case coop::M_COOP_PLAYER_STATE:
+    case M_COOP_PLAYER_STATE:
         OnRemotePlayerState(P);
         break;
         
-    case coop::M_COOP_AI_STATE:
+    case M_COOP_AI_STATE:
         OnAIState(P);
         break;
         
-    case coop::M_COOP_AI_SPAWN:
+    case M_COOP_AI_SPAWN:
         OnAISpawn(P);
         break;
         
-    case coop::M_COOP_AI_DESPAWN:
+    case M_COOP_AI_DESPAWN:
         OnAIDespawn(P);
         break;
         
-    case coop::M_COOP_DAMAGE_EVENT:
+    case M_COOP_DAMAGE_EVENT:
         coop::CoopDamageHandler::Instance().OnDamageConfirm(P);
         break;
         
@@ -288,15 +289,46 @@ void game_cl_Coop::OnRemotePlayerDespawn(NET_Packet& P)
 
 void game_cl_Coop::OnRemotePlayerState(NET_Packet& P)
 {
-    // Peek at net_id
-    u32 net_id = P.r_u32();
-    P.r_seek(P.r_tell() - sizeof(u32));
+    // The snapshot starts with net_id, so we read it first and handle accordingly
+    // Instead of seeking back, we pass the net_id to the snapshot read method
+    
+    // Read snapshot into temporary
+    coop::CoopPlayerSnapshot snapshot;
+    snapshot.snapshot_id = P.r_u32();
+    snapshot.timestamp = P.r_u32();
+    snapshot.net_id = P.r_u32();
+    
+    u32 net_id = snapshot.net_id;
     
     // Skip if this is our local player
     if (net_id == coop::CoopSessionManager::Instance().GetLocalPlayerNetID())
     {
+        // Still need to consume the rest of the packet
+        P.r_float(); P.r_float(); P.r_float();  // pos
+        P.r_float(); P.r_float(); P.r_float();  // vel  
+        P.r_float(); P.r_float(); P.r_float();  // rotation
+        P.r_float(); P.r_float(); P.r_float();  // health, stamina, radiation
+        P.r_u16(); P.r_u16(); P.r_u8(); P.r_u16();  // flags, slot, anim
         return;
     }
+    
+    // Continue reading the rest of the snapshot
+    snapshot.pos_x = P.r_float();
+    snapshot.pos_y = P.r_float();
+    snapshot.pos_z = P.r_float();
+    snapshot.vel_x = P.r_float();
+    snapshot.vel_y = P.r_float();
+    snapshot.vel_z = P.r_float();
+    snapshot.yaw = P.r_float();
+    snapshot.pitch = P.r_float();
+    snapshot.roll = P.r_float();
+    snapshot.health = P.r_float();
+    snapshot.stamina = P.r_float();
+    snapshot.radiation = P.r_float();
+    snapshot.move_flags = P.r_u16();
+    snapshot.player_flags = P.r_u16();
+    snapshot.active_slot = P.r_u8();
+    snapshot.anim_state = P.r_u16();
     
     // Find or create remote player
     coop::CoopPlayerState* remote_player = nullptr;
@@ -318,11 +350,12 @@ void game_cl_Coop::OnRemotePlayerState(NET_Packet& P)
         coop::CoopPlayerRegistry::Instance().RegisterPlayer(remote_player);
     }
     
-    // Read snapshot
-    remote_player->ReadCoopSnapshot(P);
+    // Apply snapshot directly
+    remote_player->AddSnapshotToBuffer(snapshot);
+    remote_player->GetSnapshotMutable() = snapshot;
     
     // Track for debug
-    coop::CoopDebugOverlay::Instance().OnSnapshotReceived(remote_player->GetSnapshot().snapshot_id);
+    coop::CoopDebugOverlay::Instance().OnSnapshotReceived(snapshot.snapshot_id);
 }
 
 void game_cl_Coop::OnAISpawn(NET_Packet& P)

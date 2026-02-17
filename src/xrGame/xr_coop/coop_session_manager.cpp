@@ -7,6 +7,7 @@
 #include "Level.h"
 #include "xrServer.h"
 #include "xrEngine/xr_level_controller.h"
+#include "xrServerEntities/xrMessages.h"
 
 namespace coop
 {
@@ -341,7 +342,9 @@ void CoopSessionManager::HandleJoinRequest(NET_Packet& P, ClientID sender)
     if (client_protocol_version != COOP_PROTOCOL_VERSION)
     {
         response.w_u8(JOIN_DENIED_VERSION);
-        // Send response
+        SendToPlayer(0, response, true);  // Send denial to client
+        Msg("![COOP] Join denied: protocol version mismatch (client=%u, server=%u)",
+            client_protocol_version, COOP_PROTOCOL_VERSION);
         return;
     }
     
@@ -349,7 +352,8 @@ void CoopSessionManager::HandleJoinRequest(NET_Packet& P, ClientID sender)
     if (m_players.size() >= m_session_info.max_players)
     {
         response.w_u8(JOIN_DENIED_FULL);
-        // Send response
+        SendToPlayer(0, response, true);  // Send denial to client
+        Msg("![COOP] Join denied: session full");
         return;
     }
     
@@ -359,6 +363,9 @@ void CoopSessionManager::HandleJoinRequest(NET_Packet& P, ClientID sender)
     response.w_u8(JOIN_OK);
     response.w_u32(new_player_id);
     response.w(&m_session_info, sizeof(CoopSessionInfo));
+    
+    // Send acceptance response to client
+    SendToPlayer(new_player_id, response, true);
     
     // Create player entry
     CoopPlayer new_player;

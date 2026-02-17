@@ -23,9 +23,12 @@ CoopPlayerState::CoopPlayerState()
     , m_last_update_time(0)
     , m_last_snapshot_id(0)
 {
-    ZeroMemory(&m_snapshot, sizeof(m_snapshot));
-    ZeroMemory(&m_input, sizeof(m_input));
-    ZeroMemory(m_interp_buffer, sizeof(m_interp_buffer));
+    // CoopPlayerSnapshot and CoopPlayerInput have default constructors
+    // that initialize all members properly - no need for ZeroMemory
+    for (u32 i = 0; i < INTERP_BUFFER_SIZE; ++i)
+    {
+        m_interp_buffer[i] = CoopPlayerSnapshot();
+    }
 }
 
 CoopPlayerState::~CoopPlayerState()
